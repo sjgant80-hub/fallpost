@@ -328,9 +328,26 @@ details[open] summary{color:var(--gold);margin-bottom:10px}
 
 <script>
 /* ===========================================================
-   fallpost · sovereign LinkedIn engine · ◊·κ=1
+   fallpost · sovereign LinkedIn engine · ◊·κ=1 · prime 359
    single-file · BYOK cascade · localStorage only · no backend
    =========================================================== */
+
+/* ---- fallmesh hook · BroadcastChannel fall-signal · prime 359 ---- */
+const FALL_PRIME = 359;
+const FALL_TOOL = 'fallpost';
+let fallChan = null;
+try {
+  fallChan = new BroadcastChannel('fall-signal');
+  fallChan.postMessage({ type:'beacon', tool: FALL_TOOL, prime: FALL_PRIME, ts: Date.now(), v:'1.0' });
+  fallChan.onmessage = (e) => {
+    const m = e.data || {};
+    // accept input from other tools — paste into Compose textarea
+    if (m.type === 'fallpost:input' && typeof m.text === 'string'){
+      const ta = document.querySelector('#moveInput');
+      if (ta){ ta.value = m.text; }
+    }
+  };
+} catch(e){ /* not supported · sovereign offline mode */ }
 
 const LS = {
   key: 'fallpost.apiKey',
