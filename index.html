@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>◊ fallpost · Simon's LinkedIn engine</title>
+<meta name="description" content="Sovereign LinkedIn post engine. Jung archetype + Freud shadow + Sales 101 baked in. BYOK cascade. ◊·κ=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230a0a0a'/%3E%3Ctext x='32' y='44' font-size='42' text-anchor='middle' fill='%23d4a017' font-family='serif'%3E%E2%97%8A%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href='data:application/manifest+json,{"name":"fallpost","short_name":"fallpost","start_url":"./","display":"standalone","background_color":"%230a0a0a","theme_color":"%230a0a0a","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 192 192%22%3E%3Crect width=%22192%22 height=%22192%22 fill=%22%230a0a0a%22/%3E%3Ctext x=%2296%22 y=%22132%22 font-size=%22128%22 text-anchor=%22middle%22 fill=%22%23d4a017%22 font-family=%22serif%22%3E%E2%97%8A%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"}]}'>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0a;--ink:#e8e6e3;--mute:#888;--gold:#d4a017;--amber:#e8a012;
+  --line:#1a1a1a;--card:#0e0e0e;--accent:#d4a017;
+  --serif:'Playfair Display',Georgia,serif;
+  --display:'Syne',sans-serif;
+  --mono:'DM Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;padding:24px 20px 80px;max-width:1280px;margin:0 auto}
+a{color:var(--gold);text-decoration:none}
+a:hover{text-decoration:underline}
+.glyph{font-family:var(--serif);color:var(--gold)}
+header{border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px}
+h1{font-family:var(--serif);font-weight:900;font-size:clamp(28px,3.6vw,42px);letter-spacing:-0.01em;line-height:1.05}
+h1 .sub{display:block;font-family:var(--display);font-weight:500;font-size:11px;letter-spacing:0.32em;color:var(--mute);text-transform:uppercase;margin-top:6px}
+.kappa{font-family:var(--mono);font-size:11px;color:var(--mute);letter-spacing:0.18em}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:24px}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);padding:20px}
+.panel h2{font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:0.28em;color:var(--gold);text-transform:uppercase;margin-bottom:14px;border-bottom:1px solid var(--line);padding-bottom:10px}
+label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:0.18em;color:var(--mute);text-transform:uppercase;margin-bottom:6px}
+textarea,input[type=text],input[type=password],select{
+  width:100%;background:#080808;border:1px solid var(--line);color:var(--ink);
+  font-family:var(--mono);font-size:13px;padding:10px 12px;line-height:1.5;
+  border-radius:0;outline:none;transition:border .15s
+}
+textarea:focus,input:focus,select:focus{border-color:var(--gold)}
+textarea{resize:vertical;min-height:130px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+@media (max-width:560px){.row{grid-template-columns:1fr}}
+.field{margin-bottom:14px}
+button{
+  background:transparent;border:1px solid var(--gold);color:var(--gold);
+  font-family:var(--mono);font-size:11px;letter-spacing:0.22em;text-transform:uppercase;
+  padding:10px 16px;cursor:pointer;transition:all .15s;border-radius:0
+}
+button:hover{background:var(--gold);color:#0a0a0a}
+button:disabled{opacity:0.4;cursor:not-allowed}
+button.ghost{border-color:var(--line);color:var(--mute)}
+button.ghost:hover{border-color:var(--gold);color:var(--gold);background:transparent}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.variant{border:1px solid var(--line);padding:18px 18px 14px;margin-bottom:14px;background:#080808;position:relative}
+.variant .meta{font-family:var(--mono);font-size:10px;color:var(--mute);letter-spacing:0.16em;margin-bottom:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.variant .meta .tags{color:var(--gold)}
+.variant .body{font-family:var(--mono);font-size:13.5px;line-height:1.62;white-space:pre-wrap;color:var(--ink)}
+.variant .vactions{display:flex;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);flex-wrap:wrap}
+.variant .vactions button{font-size:10px;letter-spacing:0.18em;padding:6px 10px}
+.status{font-family:var(--mono);font-size:11px;color:var(--mute);margin:10px 0;min-height:16px}
+.status.gold{color:var(--gold)}
+.status.warn{color:#e8a012}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin-bottom:18px}
+.tab{padding:10px 14px;font-family:var(--mono);font-size:10px;letter-spacing:0.22em;color:var(--mute);text-transform:uppercase;cursor:pointer;border-bottom:1px solid transparent;transition:all .15s}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab:hover{color:var(--ink)}
+.tabpane{display:none}
+.tabpane.active{display:block}
+footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;color:var(--mute);text-align:center;letter-spacing:0.16em}
+footer .glyph{margin:0 6px}
+.dial{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.dial button.opt{padding:7px 11px;font-size:10px;letter-spacing:0.14em;border-color:var(--line);color:var(--mute)}
+.dial button.opt.on{border-color:var(--gold);color:var(--gold);background:rgba(212,160,23,0.08)}
+.dial button.opt:hover{color:var(--ink)}
+details{margin-top:14px;border:1px solid var(--line);padding:12px 14px;background:#080808}
+details summary{font-family:var(--mono);font-size:10px;letter-spacing:0.22em;color:var(--mute);text-transform:uppercase;cursor:pointer;outline:none}
+details[open] summary{color:var(--gold);margin-bottom:10px}
+.score{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.score .s{background:#080808;border:1px solid var(--line);padding:10px;text-align:center}
+.score .s .n{font-family:var(--serif);font-size:24px;color:var(--gold);font-weight:700;display:block}
+.score .s .l{font-family:var(--mono);font-size:9px;letter-spacing:0.18em;color:var(--mute);text-transform:uppercase;margin-top:4px}
+.draft{padding:10px 12px;border:1px solid var(--line);margin-bottom:8px;background:#080808;cursor:pointer;transition:all .15s}
+.draft:hover{border-color:var(--gold)}
+.draft .dh{font-family:var(--mono);font-size:10px;color:var(--mute);letter-spacing:0.14em;margin-bottom:4px;display:flex;justify-content:space-between}
+.draft .dp{font-size:12px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hint{font-family:var(--mono);font-size:10px;color:var(--mute);margin-top:4px;letter-spacing:0.04em}
+.divider{height:1px;background:var(--line);margin:18px 0}
+.tone-doc{font-size:12px;line-height:1.7;color:var(--mute)}
+.tone-doc strong{color:var(--ink);font-family:var(--serif);font-style:italic;font-weight:400}
+.tone-doc h3{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:0.24em;color:var(--gold);text-transform:uppercase;margin:14px 0 6px}
+.charcount{font-family:var(--mono);font-size:10px;color:var(--mute);letter-spacing:0.12em;text-align:right;margin-top:4px}
+.charcount.warn{color:var(--amber)}
+.charcount.over{color:#c44}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1><span class="glyph">◊</span> fallpost
+      <span class="sub">Simon's LinkedIn engine · Jung · Freud · Sales 101</span>
+    </h1>
+  </div>
+  <div class="kappa">◊·κ=1 · sovereign · v1.0</div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-tab="compose">Compose</div>
+  <div class="tab" data-tab="analyze">Analyze</div>
+  <div class="tab" data-tab="drafts">Drafts</div>
+  <div class="tab" data-tab="engine">Engine</div>
+  <div class="tab" data-tab="settings">Settings</div>
+</div>
+
+<!-- COMPOSE -->
+<section class="tabpane active" id="compose">
+<div class="grid">
+  <div class="panel">
+    <h2>◊ Input</h2>
+    <div class="field">
+      <label>What's the move?</label>
+      <textarea id="moveInput" placeholder="What shipped. What changed. What angle. Raw thoughts welcome — the engine will shape it."></textarea>
+      <div class="hint">Tip: more context = sharper post. Drop the spec, the changelog, the rant.</div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Jung archetype</label>
+        <div class="dial" id="dialArchetype">
+          <button class="opt on" data-v="sovereign">Sovereign Builder</button>
+          <button class="opt" data-v="magician">Magician</button>
+          <button class="opt" data-v="outlaw">Outlaw</button>
+          <button class="opt" data-v="sage">Sage</button>
+          <button class="opt" data-v="creator">Creator</button>
+          <button class="opt" data-v="hero">Hero</button>
+        </div>
+      </div>
+      <div>
+        <label>Freud shadow intensity</label>
+        <div class="dial" id="dialShadow">
+          <button class="opt" data-v="subtle">Subtle</button>
+          <button class="opt on" data-v="medium">Medium</button>
+          <button class="opt" data-v="brutal">Brutal</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Sales hook pattern</label>
+        <div class="dial" id="dialHook">
+          <button class="opt on" data-v="interrupt">Pattern interrupt</button>
+          <button class="opt" data-v="specificity">Hard specificity</button>
+          <button class="opt" data-v="contrarian">Contrarian frame</button>
+          <button class="opt" data-v="origin">Origin story</button>
+          <button class="opt" data-v="provocation">Provocation</button>
+        </div>
+      </div>
+      <div>
+        <label>Voice register</label>
+        <div class="dial" id="dialVoice">
+          <button class="opt on" data-v="hybrid">Hybrid</button>
+          <button class="opt" data-v="polished">Polished public</button>
+          <button class="opt" data-v="brutalist">Brutalist intensity</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Length</label>
+        <div class="dial" id="dialLength">
+          <button class="opt" data-v="short">Short (≤1300)</button>
+          <button class="opt on" data-v="medium">Medium (1300–2000)</button>
+          <button class="opt" data-v="long">Long (2000–3000)</button>
+        </div>
+      </div>
+      <div>
+        <label>CTA target (optional)</label>
+        <input type="text" id="ctaInput" placeholder="ai-nativesolutions.com">
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="genBtn">⚡ Generate 3 variants</button>
+      <button id="t0Btn" class="ghost">T0 templates only</button>
+      <button id="clearBtn" class="ghost">Clear</button>
+    </div>
+    <div class="status" id="genStatus"></div>
+  </div>
+
+  <div class="panel">
+    <h2>◊ Output</h2>
+    <div id="output">
+      <div class="hint" style="text-align:center;padding:40px 0">Variants render here. Each tagged with the archetype · shadow · hook stack used.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ANALYZE -->
+<section class="tabpane" id="analyze">
+<div class="panel">
+  <h2>◊ Tone analyzer</h2>
+  <p class="hint" style="margin-bottom:14px">Paste any draft (yours, someone else's, ChatGPT's). The engine scores it on the three layers + flags weak patterns.</p>
+  <textarea id="analyzeInput" placeholder="Paste a LinkedIn post draft…" style="min-height:160px"></textarea>
+  <div class="actions"><button id="analyzeBtn">◊ Analyze</button></div>
+  <div id="analyzeOut"></div>
+</div>
+</section>
+
+<!-- DRAFTS -->
+<section class="tabpane" id="drafts">
+<div class="panel">
+  <h2>◊ Drafts (localStorage)</h2>
+  <p class="hint" style="margin-bottom:14px">Every saved variant is here. Click to reload into Compose. Nothing leaves your browser.</p>
+  <div id="draftsList"></div>
+  <div class="actions" style="margin-top:14px">
+    <button id="exportBtn" class="ghost">Export JSON</button>
+    <button id="importBtn" class="ghost">Import JSON</button>
+    <button id="wipeBtn" class="ghost">Wipe all</button>
+  </div>
+  <input type="file" id="importFile" accept="application/json" style="display:none">
+</div>
+</section>
+
+<!-- ENGINE DOCS -->
+<section class="tabpane" id="engine">
+<div class="panel">
+  <h2>◊ The tone engine</h2>
+  <div class="tone-doc">
+    <p>Three layers stacked. Each does work the others can't. Strip any one and the post falls flat.</p>
+
+    <h3>Jung · archetype framing</h3>
+    <p><strong>Sovereign Builder</strong> — "I did the work" energy. Refusal of dependency. Best for shipping announcements.<br>
+    <strong>Magician</strong> — revealing hidden mechanics. "What they don't tell you." Best for teardowns.<br>
+    <strong>Outlaw</strong> — post-SaaS, anti-rent, breaking the covenant. Best for industry critique.<br>
+    <strong>Sage</strong> — pattern recognition across many founders/years. Best for lessons posts.<br>
+    <strong>Creator</strong> — from-scratch architecture. Best for first-principles content.<br>
+    <strong>Hero</strong> — journey from broken state to individuation. Best for personal narrative.</p>
+
+    <h3>Freud · name the shadow</h3>
+    <p>Surface the repressed truth the audience won't say out loud. Common shadows:</p>
+    <p>— distribution capture (you don't own who sees your customers first)<br>
+    — dependency shame (your stack is your jailer)<br>
+    — status anxiety (the LinkedIn flex performance)<br>
+    — founder loneliness (no one sees the 2am work)<br>
+    — replacement fear (will AI eat my role?)</p>
+    <p>Intensity dial: <strong>subtle</strong> = one line · <strong>medium</strong> = a paragraph · <strong>brutal</strong> = multiple beats that don't let the reader off the hook.</p>
+
+    <h3>Sales 101 · structural</h3>
+    <p>Hook → Pain → Agitation → Solution → Proof → Higher Frame → CTA.</p>
+    <p>Hook patterns:<br>
+    → <strong>Pattern interrupt</strong> · "Not a redesign. An exorcism."<br>
+    → <strong>Hard specificity</strong> · "62 tools. 24h sync. $0 backend."<br>
+    → <strong>Contrarian</strong> · "SaaS is not infrastructure. It's rent extraction with a UI."<br>
+    → <strong>Origin</strong> · "For 18 months I watched..."<br>
+    → <strong>Provocation</strong> · "If your contact form sees your customers before you do, you don't have customers."</p>
+    <p>Close with an <em>identity offer</em>, not a feature dump. Single CTA. Bare URL. No "link in comments."</p>
+
+    <h3>Signature</h3>
+    <p>◊·κ=1 at the very bottom. Always. It's the seal.</p>
+  </div>
+</div>
+</section>
+
+<!-- SETTINGS -->
+<section class="tabpane" id="settings">
+<div class="panel">
+  <h2>◊ BYOK cascade</h2>
+  <p class="hint" style="margin-bottom:14px">Keys live in this browser only (localStorage). Never sent to any backend. Cascade tries T0 templates first, then your chosen T3 provider.</p>
+
+  <div class="field">
+    <label>Provider</label>
+    <select id="provider">
+      <option value="t0">T0 — templates only (no key needed)</option>
+      <option value="anthropic">Anthropic Claude (claude-sonnet-4.5)</option>
+      <option value="openai">OpenAI (gpt-4o)</option>
+      <option value="google">Google Gemini (gemini-1.5-pro)</option>
+      <option value="openrouter">OpenRouter (any model)</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>API key</label>
+    <input type="password" id="apiKey" placeholder="sk-…">
+    <div class="hint">Stored locally only · cleared via Wipe</div>
+  </div>
+
+  <div class="field" id="modelField" style="display:none">
+    <label>Model (openrouter only)</label>
+    <input type="text" id="modelName" placeholder="anthropic/claude-3.5-sonnet">
+  </div>
+
+  <div class="actions">
+    <button id="saveKeyBtn">Save</button>
+    <button id="testKeyBtn" class="ghost">Test</button>
+    <button id="wipeKeyBtn" class="ghost">Wipe key</button>
+  </div>
+  <div class="status" id="keyStatus"></div>
+
+  <div class="divider"></div>
+  <h2 style="margin-top:0">◊ Voice profile</h2>
+  <p class="hint" style="margin-bottom:14px">Personal touches the engine bakes into every post. Leave blank for Simon defaults.</p>
+  <div class="field">
+    <label>Name / handle</label>
+    <input type="text" id="profName" placeholder="Simon Gant · sjgant80-hub">
+  </div>
+  <div class="field">
+    <label>Brand seal (signature line)</label>
+    <input type="text" id="profSeal" placeholder="◊·κ=1">
+  </div>
+  <div class="field">
+    <label>Banned phrases (comma separated)</label>
+    <input type="text" id="profBanned" placeholder="excited to announce, thrilled to share, game-changer, in today's world">
+  </div>
+  <div class="actions">
+    <button id="saveProfBtn">Save profile</button>
+  </div>
+</div>
+</section>
+
+<footer>
+  ◊·κ=1 <span class="glyph">·</span> fallpost <span class="glyph">·</span> sovereign · BYOK · no backend
+  <br><br>
+  part of the <a href="https://www.ai-nativesolutions.com">ai-nativesolutions.com</a> estate
+</footer>
+
+<script>
+/* ===========================================================
+   fallpost · sovereign LinkedIn engine · ◊·κ=1
+   single-file · BYOK cascade · localStorage only · no backend
+   =========================================================== */
+
+const LS = {
+  key: 'fallpost.apiKey',
+  prov: 'fallpost.provider',
+  model: 'fallpost.model',
+  drafts: 'fallpost.drafts',
+  prof: 'fallpost.profile',
+  dials: 'fallpost.dials',
+};
+
+const DEFAULT_PROFILE = {
+  name: 'Simon Gant · sjgant80-hub',
+  seal: '◊·κ=1',
+  banned: 'excited to announce,thrilled to share,game-changer,in today\'s world,leverage,synergize,circle back,at the end of the day,it goes without saying,needless to say'
+};
+
+const ARCHETYPES = {
+  sovereign:  { label:'Sovereign Builder', voice:'I did the work. Refusal of dependency.',
+                openers:['I rebuilt {thing} last week.','I shipped {thing}.','I did the work.','I stopped waiting and built it.'] },
+  magician:   { label:'Magician', voice:'Revealing the hidden mechanic.',
+                openers:['Here\'s what they don\'t tell you about {thing}.','The mechanic behind {thing} is simpler than the price suggests.','Pull the curtain on {thing}.'] },
+  outlaw:     { label:'Outlaw', voice:'Post-SaaS, anti-rent, covenant-breaking.',
+                openers:['{thing} is not infrastructure. It\'s rent extraction with a UI.','I\'m done paying tribute.','Burn the middleman.'] },
+  sage:       { label:'Sage', voice:'Pattern recognition across years.',
+                openers:['For 18 months I watched the same pattern.','Every founder I talk to has the same shadow.','You see this enough times, the pattern names itself.'] },
+  creator:    { label:'Creator', voice:'From-scratch architecture.',
+                openers:['Built {thing} from first principles.','Started from a blank file.','One HTML file. No framework. No backend.'] },
+  hero:       { label:'Hero', voice:'Journey from broken state to individuation.',
+                openers:['Two years ago I was renting my own distribution.','I used to think the stack was the strategy.','The first version was broken. So was I.'] }
+};
+
+const SHADOWS = {
+  subtle:  { label:'subtle',  beats:1, lines:[
+    'The thing nobody says out loud:',
+    'The shadow underneath:',
+    'What the deck never mentions:'
+  ]},
+  medium:  { label:'medium',  beats:2, lines:[
+    'The shadow nobody names:',
+    'The thing you don\'t want to admit:',
+    'The part the pitch deck buries:'
+  ]},
+  brutal:  { label:'brutal',  beats:4, lines:[
+    'Let me name the shadow.',
+    'Here\'s what you won\'t say at the team meeting:',
+    'The repressed truth in this industry:',
+    'The thing every founder feels and nobody posts:'
+  ]}
+};
+
+const HOOKS = {
+  interrupt:    { label:'pattern interrupt',
+                  templates:['Not {a}. {b}.','{a}. Then {b}.','{a} — actually no. {b}.'] },
+  specificity:  { label:'hard specificity',
+                  templates:['{n1}. {n2}. {n3}.','{n1} {unit}. {duration}. {cost}.'] },
+  contrarian:   { label:'contrarian frame',
+                  templates:['{thing} is not {expected}. It\'s {actual}.','Everyone says {claim}. The opposite is true.'] },
+  origin:       { label:'origin story',
+                  templates:['For {duration} I watched {pain}.','Two years ago I was {brokenState}.'] },
+  provocation:  { label:'provocation question',
+                  templates:['If {condition}, you don\'t have {thing}. You have a {weakerThing}.','How much of your {asset} do you actually own?'] }
+};
+
+const COMMON_SHADOWS = [
+  'you don\'t own your distribution. The middleman does.',
+  'your stack is your jailer.',
+  'the SaaS knows your customers before you do.',
+  'you\'re paying rent on infrastructure you could own.',
+  'the platform you ship on is also your competitor.',
+  'every "free tier" is a future leverage point against you.'
+];
+
+/* ---------- DOM helpers ---------- */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const ls = {
+  get: (k,d=null) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch(e){ return d; } },
+  set: (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} },
+  del: (k) => { try { localStorage.removeItem(k); } catch(e){} }
+};
+
+/* ---------- state ---------- */
+let dials = ls.get(LS.dials, { archetype:'sovereign', shadow:'medium', hook:'interrupt', voice:'hybrid', length:'medium' });
+let profile = ls.get(LS.prof, DEFAULT_PROFILE);
+
+/* ---------- tabs ---------- */
+$$('.tab').forEach(t => t.addEventListener('click', () => {
+  $$('.tab').forEach(x => x.classList.remove('active'));
+  $$('.tabpane').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  $('#'+t.dataset.tab).classList.add('active');
+  if (t.dataset.tab === 'drafts') renderDrafts();
+}));
+
+/* ---------- dials ---------- */
+function wireDial(id, key){
+  const root = $('#'+id);
+  // restore
+  root.querySelectorAll('.opt').forEach(b => b.classList.toggle('on', b.dataset.v === dials[key]));
+  root.addEventListener('click', e => {
+    const b = e.target.closest('.opt'); if (!b) return;
+    root.querySelectorAll('.opt').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    dials[key] = b.dataset.v;
+    ls.set(LS.dials, dials);
+  });
+}
+wireDial('dialArchetype','archetype');
+wireDial('dialShadow','shadow');
+wireDial('dialHook','hook');
+wireDial('dialVoice','voice');
+wireDial('dialLength','length');
+
+/* ---------- settings restore ---------- */
+$('#provider').value = ls.get(LS.prov, 't0');
+$('#apiKey').value = ls.get(LS.key, '');
+$('#modelName').value = ls.get(LS.model, '');
+$('#modelField').style.display = $('#provider').value === 'openrouter' ? 'block' : 'none';
+$('#provider').addEventListener('change', e => {
+  ls.set(LS.prov, e.target.value);
+  $('#modelField').style.display = e.target.value === 'openrouter' ? 'block' : 'none';
+});
+
+function restoreProfile(){
+  $('#profName').value = profile.name || '';
+  $('#profSeal').value = profile.seal || '';
+  $('#profBanned').value = profile.banned || '';
+}
+restoreProfile();
+
+$('#saveKeyBtn').onclick = () => {
+  ls.set(LS.key, $('#apiKey').value);
+  ls.set(LS.model, $('#modelName').value);
+  status('keyStatus','◊ saved locally','gold');
+};
+$('#wipeKeyBtn').onclick = () => {
+  if (!confirm('Wipe API key from this browser?')) return;
+  ls.del(LS.key); $('#apiKey').value = '';
+  status('keyStatus','wiped','gold');
+};
+$('#testKeyBtn').onclick = async () => {
+  status('keyStatus','testing…');
+  try { await llmCall('Say "ok" and nothing else.', 8); status('keyStatus','◊ provider responded','gold'); }
+  catch(e){ status('keyStatus','✗ '+e.message,'warn'); }
+};
+$('#saveProfBtn').onclick = () => {
+  profile = { name: $('#profName').value, seal: $('#profSeal').value, banned: $('#profBanned').value };
+  ls.set(LS.prof, profile);
+  status('keyStatus','◊ profile saved','gold');
+};
+
+function status(id, msg, cls=''){
+  const el = $('#'+id);
+  el.className = 'status ' + cls;
+  el.textContent = msg;
+}
+
+/* ---------- T0 template engine (works with no API key) ---------- */
+function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function pickCommonShadow(){ return pickRandom(COMMON_SHADOWS); }
+
+function buildT0Variant(input, dialChoices){
+  const a = ARCHETYPES[dialChoices.archetype];
+  const s = SHADOWS[dialChoices.shadow];
+  const h = HOOKS[dialChoices.hook];
+  const cta = $('#ctaInput').value.trim() || 'ai-nativesolutions.com';
+  const seal = profile.seal || '◊·κ=1';
+
+  // Extract a "thing" from input — first noun-ish phrase
+  const thing = (input.match(/\b([A-Z][a-zA-Z0-9_-]{2,}|[a-z][a-z]+(?:\s[a-z]+){0,2})\b/) || ['the work'])[0];
+  const opener = pickRandom(a.openers).replace('{thing}', thing);
+  const shadowLine = pickRandom(s.lines) + ' ' + pickCommonShadow();
+
+  let body = '';
+  if (dialChoices.length === 'short'){
+    body = `${opener}
+
+${shadowLine}
+
+So I did the work.
+
+${input.split('\n').slice(0,2).join('\n')}
+
+Come look.
+
+${cta}
+
+${seal}`;
+  } else if (dialChoices.length === 'long'){
+    body = `${opener}
+
+Not a one-line announcement. A re-architecture.
+
+${shadowLine}
+
+For 18 months I watched the same pattern repeat — builders ship something they're proud of, and the stack underneath quietly eats the upside.
+
+So I did the work.
+
+${input}
+
+What changed under the hood ↓
+
+→ Sovereign single-HTML architecture · no backend dependency
+→ BYOK cascade · keys never leave the browser
+→ Auto-indexed in fall-registry within 24h
+→ Cross-tool mesh via BroadcastChannel \`fall-signal\`
+
+The deeper move:
+
+SaaS sold you "infrastructure as a service."
+What they delivered was rent extraction with a UI.
+
+Sovereign tooling is the opposite covenant.
+You own the HTML. You own the data. You own the upside.
+
+This isn't anti-SaaS. It's post-SaaS.
+
+If you're building an AI-native tool and you're tired of paying for the privilege of someone else seeing your customers first —
+
+come look.
+
+${cta}
+
+${seal}`;
+  } else {
+    body = `${opener}
+
+${shadowLine}
+
+So I did the work.
+
+${input}
+
+What changed ↓
+
+→ Sovereign single-HTML · no backend
+→ BYOK cascade · keys never leave the browser
+→ Auto-synced to fall-registry
+
+This isn't anti-SaaS. It's post-SaaS.
+
+If you're building something real and you're tired of paying rent on your own distribution —
+
+come look.
+
+${cta}
+
+${seal}`;
+  }
+  return {
+    body,
+    meta: { archetype: a.label, shadow: s.label, hook: h.label, voice: dialChoices.voice, length: dialChoices.length, tier:'T0' }
+  };
+}
+
+/* ---------- T3 system prompt ---------- */
+function buildSystemPrompt(){
+  const banned = (profile.banned || '').split(',').map(x=>x.trim()).filter(Boolean);
+  return `You are ${profile.name || 'Simon Gant'}'s LinkedIn voice engine. ${profile.seal || '◊·κ=1'}.
+
+VOICE SIGNATURE
+- Brutalist intensity, polished public register
+- Pattern-interrupt openers. NEVER use: ${banned.join(', ')}
+- Short lines. Generous whitespace.
+- Arrow bullets (→) for feature lists
+- At least one specific number per post (credibility anchor)
+- Single CTA at the end — bare URL, no "link in comments"
+- ${profile.seal || '◊·κ=1'} signature at the very bottom, always
+- Lowercase brand terms: fall-registry, sjgant80-hub, ai-nativesolutions
+- No emojis except ◊ ⚡ ◯ if structurally needed
+
+TONE ENGINE — three layers stacked:
+
+JUNG (archetype framing) — write from this archetype:
+${Object.entries(ARCHETYPES).map(([k,v]) => `  • ${v.label}: ${v.voice}`).join('\n')}
+
+FREUD (shadow naming) — surface the repressed truth the audience won't say out loud.
+Common shadows: distribution capture, dependency shame, status anxiety, founder loneliness, replacement fear.
+Intensity: subtle (one line) · medium (a paragraph) · brutal (multiple beats).
+
+SALES 101 (structural):
+Hook → Pain → Agitation → Solution → Proof → Higher Frame → CTA.
+Hook patterns:
+  → Pattern interrupt: "Not a redesign. An exorcism."
+  → Hard specificity: "62 tools. 24h sync. $0 backend."
+  → Contrarian: "X is not Y. It's Z."
+  → Origin: "For 18 months I watched..."
+  → Provocation: "If [condition], you don't have [thing]."
+
+Close with an IDENTITY offer, not a feature dump.
+
+OUTPUT FORMAT
+Return exactly 3 variants. Use different hook patterns across them.
+For each variant output:
+
+VARIANT N · archetype: X · shadow: Y · hook: Z
+---
+[the post text, ready to paste — preserve line breaks exactly]
+---
+
+No preamble. No explanation. Just the three variants.`;
+}
+
+function buildUserPrompt(input, d){
+  return `INPUT (what the post is about):
+"""
+${input}
+"""
+
+DIAL SETTINGS
+- Archetype: ${ARCHETYPES[d.archetype].label}
+- Shadow intensity: ${SHADOWS[d.shadow].label}
+- Hook for variant 1: ${HOOKS[d.hook].label} (variants 2 and 3 use different patterns)
+- Voice register: ${d.voice}
+- Length target: ${d.length} (short ≤1300, medium 1300–2000, long 2000–3000 chars)
+- CTA: ${$('#ctaInput').value.trim() || 'ai-nativesolutions.com'}
+
+Write 3 LinkedIn-ready variants now.`;
+}
+
+/* ---------- LLM cascade calls ---------- */
+async function llmCall(prompt, maxTok=2400){
+  const provider = ls.get(LS.prov, 't0');
+  const key = ls.get(LS.key, '');
+  if (provider === 't0') throw new Error('T0 mode · no LLM call');
+  if (!key) throw new Error('no API key configured');
+
+  if (provider === 'anthropic'){
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-5-20250929',
+        max_tokens: maxTok,
+        system: buildSystemPrompt(),
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    if (!r.ok) throw new Error('anthropic '+r.status+' '+(await r.text()).slice(0,140));
+    const j = await r.json();
+    return j.content[0].text;
+  }
+  if (provider === 'openai'){
+    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method:'POST',
+      headers:{'content-type':'application/json','authorization':'Bearer '+key},
+      body: JSON.stringify({
+        model:'gpt-4o',
+        max_tokens: maxTok,
+        messages:[{role:'system',content:buildSystemPrompt()},{role:'user',content:prompt}]
+      })
+    });
+    if (!r.ok) throw new Error('openai '+r.status+' '+(await r.text()).slice(0,140));
+    const j = await r.json();
+    return j.choices[0].message.content;
+  }
+  if (provider === 'google'){
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${key}`, {
+      method:'POST',
+      headers:{'content-type':'application/json'},
+      body: JSON.stringify({
+        contents:[{role:'user',parts:[{text: buildSystemPrompt()+'\n\n'+prompt}]}],
+        generationConfig:{ maxOutputTokens: maxTok }
+      })
+    });
+    if (!r.ok) throw new Error('google '+r.status+' '+(await r.text()).slice(0,140));
+    const j = await r.json();
+    return j.candidates[0].content.parts[0].text;
+  }
+  if (provider === 'openrouter'){
+    const model = ls.get(LS.model,'') || 'anthropic/claude-3.5-sonnet';
+    const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method:'POST',
+      headers:{'content-type':'application/json','authorization':'Bearer '+key,'http-referer':'https://sjgant80-hub.github.io/fallpost/','x-title':'fallpost'},
+      body: JSON.stringify({
+        model,
+        max_tokens: maxTok,
+        messages:[{role:'system',content:buildSystemPrompt()},{role:'user',content:prompt}]
+      })
+    });
+    if (!r.ok) throw new Error('openrouter '+r.status+' '+(await r.text()).slice(0,140));
+    const j = await r.json();
+    return j.choices[0].message.content;
+  }
+  throw new Error('unknown provider');
+}
+
+/* ---------- LLM output parser ---------- */
+function parseLLMVariants(text){
+  // Expect: VARIANT N · archetype: X · shadow: Y · hook: Z\n---\n...body...\n---
+  const variants = [];
+  const re = /VARIANT\s*(\d+)\s*[·•]\s*archetype:\s*([^·•\n]+)\s*[·•]\s*shadow:\s*([^·•\n]+)\s*[·•]\s*hook:\s*([^\n]+)\s*\n-{2,}\n([\s\S]*?)(?=\n-{2,}|$)/gi;
+  let m;
+  while ((m = re.exec(text)) !== null){
+    let body = m[5].trim();
+    // strip trailing --- if present
+    body = body.replace(/\n-{2,}\s*$/, '').trim();
+    variants.push({
+      body,
+      meta: {
+        archetype: m[2].trim(),
+        shadow: m[3].trim(),
+        hook: m[4].trim(),
+        tier: 'T3'
+      }
+    });
+  }
+  if (!variants.length){
+    // fallback — split on double-dash dividers
+    const chunks = text.split(/\n-{3,}\n/).map(c => c.trim()).filter(c => c.length > 100);
+    chunks.slice(0,3).forEach((body,i) => variants.push({ body, meta:{archetype:'?', shadow:'?', hook:'?', tier:'T3'} }));
+  }
+  return variants;
+}
+
+/* ---------- generate handlers ---------- */
+$('#genBtn').onclick = async () => {
+  const input = $('#moveInput').value.trim();
+  if (!input){ status('genStatus','✗ paste some context first','warn'); return; }
+  const provider = ls.get(LS.prov, 't0');
+  if (provider === 't0'){ return generateT0(input); }
+  status('genStatus','◊ cascading via '+provider+'…','gold');
+  $('#genBtn').disabled = true;
+  try {
+    const out = await llmCall(buildUserPrompt(input, dials));
+    const variants = parseLLMVariants(out);
+    renderVariants(variants);
+    status('genStatus','◊ '+variants.length+' variants generated','gold');
+  } catch (e){
+    status('genStatus','✗ '+e.message+' — falling back to T0','warn');
+    generateT0(input);
+  } finally {
+    $('#genBtn').disabled = false;
+  }
+};
+
+$('#t0Btn').onclick = () => {
+  const input = $('#moveInput').value.trim();
+  if (!input){ status('genStatus','✗ paste some context first','warn'); return; }
+  generateT0(input);
+};
+
+function generateT0(input){
+  const variants = [
+    buildT0Variant(input, dials),
+    buildT0Variant(input, {...dials, hook: dials.hook==='interrupt' ? 'specificity' : 'interrupt'}),
+    buildT0Variant(input, {...dials, hook: 'contrarian', shadow: dials.shadow==='brutal'?'medium':'brutal'})
+  ];
+  renderVariants(variants);
+  status('genStatus','◊ T0 templates · 3 variants · no API used','gold');
+}
+
+$('#clearBtn').onclick = () => {
+  $('#moveInput').value = '';
+  $('#ctaInput').value = '';
+  $('#output').innerHTML = '<div class="hint" style="text-align:center;padding:40px 0">Variants render here.</div>';
+  status('genStatus','');
+};
+
+/* ---------- variant render ---------- */
+function renderVariants(variants){
+  const out = $('#output');
+  out.innerHTML = '';
+  variants.forEach((v, i) => {
+    const chars = v.body.length;
+    const charClass = chars > 3000 ? 'over' : chars > 2400 ? 'warn' : '';
+    const div = document.createElement('div');
+    div.className = 'variant';
+    div.innerHTML = `
+      <div class="meta">
+        <span>VARIANT ${i+1} · tier ${v.meta.tier}</span>
+        <span class="tags">${escapeHTML(v.meta.archetype)} · ${escapeHTML(v.meta.shadow)} · ${escapeHTML(v.meta.hook)}</span>
+      </div>
+      <div class="body"></div>
+      <div class="charcount ${charClass}">${chars} chars · ${Math.round(chars/5)} words</div>
+      <div class="vactions">
+        <button data-act="copy">Copy</button>
+        <button data-act="save" class="ghost">Save draft</button>
+        <button data-act="li" class="ghost">Open LinkedIn</button>
+        <button data-act="edit" class="ghost">Edit inline</button>
+      </div>`;
+    div.querySelector('.body').textContent = v.body;
+    div.querySelectorAll('.vactions button').forEach(b => {
+      b.onclick = () => handleVariantAction(b.dataset.act, v, div);
+    });
+    out.appendChild(div);
+  });
+}
+
+function escapeHTML(s){ return String(s||'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+
+function handleVariantAction(act, v, div){
+  if (act === 'copy'){
+    navigator.clipboard.writeText(v.body).then(() => {
+      const btn = div.querySelector('[data-act=copy]');
+      const old = btn.textContent; btn.textContent = '✓ Copied'; setTimeout(()=>btn.textContent=old, 1400);
+    });
+  } else if (act === 'save'){
+    saveDraft(v);
+    const btn = div.querySelector('[data-act=save]');
+    const old = btn.textContent; btn.textContent = '✓ Saved'; setTimeout(()=>btn.textContent=old, 1400);
+  } else if (act === 'li'){
+    navigator.clipboard.writeText(v.body).then(() => {
+      window.open('https://www.linkedin.com/feed/?shareActive=true','_blank');
+    });
+  } else if (act === 'edit'){
+    const body = div.querySelector('.body');
+    body.contentEditable = body.contentEditable === 'true' ? 'false' : 'true';
+    body.style.outline = body.contentEditable === 'true' ? '1px dashed #d4a017' : 'none';
+    if (body.contentEditable === 'true'){ body.focus(); }
+    else { v.body = body.textContent; }
+  }
+}
+
+/* ---------- drafts ---------- */
+function saveDraft(v){
+  const drafts = ls.get(LS.drafts, []);
+  drafts.unshift({ ts: Date.now(), body: v.body, meta: v.meta });
+  ls.set(LS.drafts, drafts.slice(0,200));
+}
+function renderDrafts(){
+  const drafts = ls.get(LS.drafts, []);
+  const list = $('#draftsList');
+  if (!drafts.length){ list.innerHTML = '<div class="hint" style="text-align:center;padding:30px 0">No drafts yet. Generate something and hit Save.</div>'; return; }
+  list.innerHTML = '';
+  drafts.forEach((d,i) => {
+    const div = document.createElement('div');
+    div.className = 'draft';
+    const date = new Date(d.ts).toLocaleString();
+    div.innerHTML = `
+      <div class="dh">
+        <span>${date}</span>
+        <span style="color:var(--gold)">${escapeHTML(d.meta.archetype||'?')} · ${escapeHTML(d.meta.hook||'?')}</span>
+      </div>
+      <div class="dp">${escapeHTML((d.body||'').slice(0,160))}…</div>`;
+    div.onclick = () => {
+      $('#output').innerHTML = '';
+      renderVariants([d]);
+      $$('.tab').forEach(t => t.classList.remove('active'));
+      $$('.tabpane').forEach(t => t.classList.remove('active'));
+      $('.tab[data-tab=compose]').classList.add('active');
+      $('#compose').classList.add('active');
+    };
+    list.appendChild(div);
+  });
+}
+$('#exportBtn').onclick = () => {
+  const blob = new Blob([JSON.stringify(ls.get(LS.drafts, []),null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `fallpost-drafts-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+};
+$('#importBtn').onclick = () => $('#importFile').click();
+$('#importFile').onchange = async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  const text = await f.text();
+  try {
+    const arr = JSON.parse(text);
+    if (!Array.isArray(arr)) throw new Error('not an array');
+    const cur = ls.get(LS.drafts, []);
+    ls.set(LS.drafts, arr.concat(cur).slice(0,500));
+    renderDrafts();
+  } catch (err){ alert('import failed: '+err.message); }
+};
+$('#wipeBtn').onclick = () => {
+  if (!confirm('Wipe all drafts?')) return;
+  ls.del(LS.drafts); renderDrafts();
+};
+
+/* ---------- analyzer ---------- */
+$('#analyzeBtn').onclick = () => {
+  const text = $('#analyzeInput').value.trim();
+  if (!text){ return; }
+  const a = analyze(text);
+  $('#analyzeOut').innerHTML = `
+    <div class="score">
+      <div class="s"><span class="n">${a.jung}</span><span class="l">Jung · archetype</span></div>
+      <div class="s"><span class="n">${a.freud}</span><span class="l">Freud · shadow</span></div>
+      <div class="s"><span class="n">${a.sales}</span><span class="l">Sales 101 · structure</span></div>
+    </div>
+    <details open>
+      <summary>Diagnosis</summary>
+      <div class="tone-doc" style="margin-top:10px">
+        ${a.notes.map(n => `<p>→ ${escapeHTML(n)}</p>`).join('')}
+      </div>
+    </details>`;
+};
+
+function analyze(text){
+  let jung = 0, freud = 0, sales = 0;
+  const notes = [];
+  const lc = text.toLowerCase();
+
+  // JUNG — archetypal language
+  const jungSignals = ['rebuilt','shipped','sovereign','i did the work','from scratch','first principles','journey','years','watched','pattern','built'];
+  jung = Math.min(10, jungSignals.filter(s => lc.includes(s)).length * 2);
+  if (jung < 4) notes.push('Weak archetypal voice. Pick a Jungian frame (Sovereign, Outlaw, Sage, Magician, Creator, Hero) and lean into its language.');
+
+  // FREUD — shadow surfacing
+  const freudSignals = ['shadow','nobody says','don\'t want to admit','repressed','underneath','truth','the thing you'];
+  freud = Math.min(10, freudSignals.filter(s => lc.includes(s)).length * 3);
+  if (freud < 3) notes.push('No shadow named. Add a line that surfaces the repressed truth the audience won\'t say out loud.');
+
+  // SALES 101 — structure
+  const lines = text.split('\n').filter(l => l.trim().length);
+  const hasHookInterrupt = /^.{1,60}\.\s+/.test(lines[0]||'') || /^not /i.test(lines[0]||'');
+  const hasNumbers = /\b\d+\b/.test(text);
+  const hasBullets = /[→•◊⚡]/.test(text);
+  const hasCTA = /https?:\/\/|come look|join|start|build/i.test(text.split('\n').slice(-5).join(' '));
+  sales = (hasHookInterrupt?3:0) + (hasNumbers?3:0) + (hasBullets?2:0) + (hasCTA?2:0);
+  if (!hasHookInterrupt) notes.push('Hook is soft. Try a pattern interrupt or hard-specificity opener.');
+  if (!hasNumbers) notes.push('No specific number anywhere. One concrete number = credibility anchor.');
+  if (!hasBullets) notes.push('No arrow bullets. The eye needs scan-anchors on mobile.');
+  if (!hasCTA) notes.push('Weak CTA at the bottom. Bare URL + identity invitation works best.');
+
+  // banned phrases
+  const banned = ['excited to announce','thrilled to share','game-changer','in today\'s world','leverage','synergize'];
+  const found = banned.filter(b => lc.includes(b));
+  if (found.length) notes.push('Banned LinkedIn-ese detected: ' + found.join(', ') + '. Rewrite those lines.');
+
+  // signature
+  if (!text.includes('◊·κ=1') && !text.includes('◊')) notes.push('No ◊ signature. The seal earns recognition over time.');
+
+  // length
+  if (text.length > 3000) notes.push('Over LinkedIn\'s 3000-char limit. Cut.');
+  if (text.length < 400) notes.push('Too short to land the hook → shadow → CTA arc. Aim for 1300+.');
+
+  if (!notes.length) notes.push('Strong on all three layers. Ready to post.');
+
+  return { jung, freud, sales, notes };
+}
+
+/* ---------- pre-fill example ---------- */
+if (!$('#moveInput').value){
+  $('#moveInput').placeholder = `Example:
+"Just shipped fallpost — a sovereign LinkedIn engine that bakes the Jung+Freud+Sales 101 tone stack into a single HTML file. BYOK cascade, drafts in localStorage, no backend. Part of the ai-nativesolutions.com estate. ◊·κ=1"`;
+}
+
+</script>
+</body>
+</html>
